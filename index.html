@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6 offset-md-3">
+        <form action="/add" method="POST" class="d-flex">
+            <input type="text" name="content" class="form-control me-2" placeholder="Quick idea (e.g., Areeb platform update, forslash outreach)..." required>
+            <button type="submit" class="btn btn-primary">Capture</button>
+        </form>
+    </div>
+</div>
+
+<div class="row kanban-board">
+    {% for status in ['Idea', 'Planned', 'Posted'] %}
+    <div class="col-md-4 kanban-col">
+        <h4 class="text-center">{{ status }}</h4>
+        <div class="kanban-container" ondrop="drop(event, '{{ status }}')" ondragover="allowDrop(event)">
+            {% for post in posts %}
+                {% if post['status'] == status %}
+                <div class="card mb-3 kanban-card position-relative" draggable="true" ondragstart="drag(event, {{ post['id'] }})" id="card-{{ post['id'] }}">
+
+                    <!-- Delete Button -->
+                    <button class="btn btn-sm text-danger position-absolute top-0 end-0 m-1"
+                            onclick="deletePost({{ post['id'] }})"
+                            title="Delete"
+                            style="z-index: 10; font-weight: bold; background: none; border: none;">&times;</button>
+
+                    <div class="card-body">
+                        <p class="card-text pe-3">{{ post['content'] }}</p>
+                        <small class="text-muted d-block mb-2">Source: {{ post['channel'] }}</small>
+                        <div class="platform-toggles">
+                            {% for platform in ['facebook', 'instagram', 'tiktok', 'youtube', 'linkedin'] %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox"
+                                       onchange="updatePlatform(this, {{ post['id'] }}, '{{ platform }}')"
+                                       {% if post[platform] == 1 %}checked{% endif %}>
+                                <label class="form-check-label">{{ platform[:2].upper() }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
